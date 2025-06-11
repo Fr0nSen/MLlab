@@ -1,0 +1,15 @@
+{
+  "name": "website-project",
+  "version": "1.0.0",
+  "description": "A simple website with multiple pages and navigation.",
+  "main": "src/index.html",
+  "scripts": {
+    "start": "live-server src"
+  },
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "live-server": "^1.2.1"
+  }
+}
