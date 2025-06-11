@@ -19,40 +19,32 @@ const Page8 = () => {
                             <code>
 {`import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.svm import SVC
-from sklearn.datasets import make_moons
-from sklearn.preprocessing import StandardScaler
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+from sklearn import tree
 
-# Generate dataset
-X, y = make_moons(n_samples=100, noise=0.15, random_state=42)
+data = load_breast_cancer()
+X = data.data
+y = data.target
 
-# Scale the features
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+clf = DecisionTreeClassifier(random_state=42)
+clf.fit(X_train, y_train)
+y_pred = clf.predict(X_test)
 
-# Create and train SVM with different kernels
-kernels = ['linear', 'poly', 'rbf']
-fig, axes = plt.subplots(1, 3, figsize=(15, 4))
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Model Accuracy: {accuracy * 100:.2f}%")
+new_sample = np.array([X_test[0]])
+prediction = clf.predict(new_sample)
 
-for ax, kernel in zip(axes, kernels):
-    # Train SVM
-    svm = SVC(kernel=kernel)
-    svm.fit(X_scaled, y)
-    
-    # Create mesh grid
-    x_min, x_max = X_scaled[:, 0].min() - 0.5, X_scaled[:, 0].max() + 0.5
-    y_min, y_max = X_scaled[:, 1].min() - 0.5, X_scaled[:, 1].max() + 0.5
-    xx, yy = np.meshgrid(np.arange(x_min, x_max, 0.02),
-                        np.arange(y_min, y_max, 0.02))
-    
-    # Plot decision boundary
-    Z = svm.predict(np.c_[xx.ravel(), yy.ravel()])
-    Z = Z.reshape(xx.shape)
-    ax.contourf(xx, yy, Z, alpha=0.4)
-    ax.scatter(X_scaled[:, 0], X_scaled[:, 1], c=y, alpha=0.8)
-    ax.set_title(f'SVM with {kernel} kernel')
+prediction_class = "Benign" if prediction == 1 else "Malignant"
+print(f"Predicted Class for the new sample: {prediction_class}")
 
-plt.tight_layout()
+plt.figure(figsize=(12,8))
+tree.plot_tree(clf, filled=True, feature_names=data.feature_names, class_names=data.target_names)
+plt.title("Decision Tree - Breast Cancer Dataset")
 plt.show()`}
                             </code>
                         </pre>

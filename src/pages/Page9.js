@@ -18,45 +18,40 @@ const Page9 = () => {
                         <pre>
                             <code>
 {`import numpy as np
+from sklearn.datasets import fetch_olivetti_faces
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 import matplotlib.pyplot as plt
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.datasets import make_classification
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix
-import seaborn as sns
 
-# Generate a random classification dataset
-X, y = make_classification(n_samples=1000, n_features=20, n_informative=15,
-                         n_redundant=5, random_state=42)
+data = fetch_olivetti_faces(shuffle=True, random_state=42)
+X = data.data
+y = data.target
 
-# Split the data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
-# Create and train the random forest
-rf = RandomForestClassifier(n_estimators=100, random_state=42)
-rf.fit(X_train, y_train)
+gnb = GaussianNB()
+gnb.fit(X_train, y_train)
+y_pred = gnb.predict(X_test)
 
-# Make predictions
-y_pred = rf.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print(f'Accuracy: {accuracy * 100:.2f}%')
 
-# Plot feature importances
-importances = rf.feature_importances_
-indices = np.argsort(importances)[::-1]
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred, zero_division=1))
 
-plt.figure(figsize=(10, 6))
-plt.title("Feature Importances")
-plt.bar(range(X.shape[1]), importances[indices])
-plt.xticks(range(X.shape[1]), [f"Feature {i}" for i in indices], rotation=45)
-plt.tight_layout()
-plt.show()
+print("\nConfusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
 
-# Plot confusion matrix
-plt.figure(figsize=(8, 6))
-cm = confusion_matrix(y_test, y_pred)
-sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
-plt.title('Confusion Matrix')
-plt.ylabel('True Label')
-plt.xlabel('Predicted Label')
+cross_val_accuracy = cross_val_score(gnb, X, y, cv=5, scoring='accuracy')
+print(f'\nCross-validation accuracy: {cross_val_accuracy.mean() * 100:.2f}%')
+
+fig, axes = plt.subplots(3, 5, figsize=(12, 8))
+for ax, image, label, prediction in zip(axes.ravel(), X_test, y_test, y_pred):
+    ax.imshow(image.reshape(64, 64), cmap=plt.cm.gray)
+    ax.set_title(f"True: {label}, Pred: {prediction}")
+    ax.axis('off')
+
 plt.show()`}
                             </code>
                         </pre>
